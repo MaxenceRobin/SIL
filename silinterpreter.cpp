@@ -214,6 +214,32 @@ Any SILinterpreter::visitParenthesis_expression(SILParser::Parenthesis_expressio
 }
 
 /**
+ * @brief Visits a cast expression
+ */
+Any SILinterpreter::visitCast(SILParser::CastContext *context)
+{
+    auto& value = visit(context->expression()).as<RValue>();
+    const std::string& type = context->TYPE()->getText();
+
+    if (type == "integer")
+    {
+        return cast<int>(value);
+    }
+    else if (type == "number")
+    {
+        return cast<double>(value);
+    }
+    else if (type == "string")
+    {
+        return cast<std::string>(value);
+    }
+    else if (type == "boolean")
+    {
+        return cast<bool>(value);
+    }
+}
+
+/**
  * @brief Visit an expression representing a value
  */
 Any SILinterpreter::visitValue_expression(SILParser::Value_expressionContext *context)
