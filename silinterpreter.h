@@ -29,6 +29,10 @@ private:
 
     virtual Any visitAtomic_value(SILParser::Atomic_valueContext* context) override;
     virtual Any visitAtom(SILParser::AtomContext* context) override;
+    virtual Any visitParenthesis_expression(SILParser::Parenthesis_expressionContext* context) override;
+
+    virtual Any visitMultiplication_division_modulo(SILParser::Multiplication_division_moduloContext* context) override;
+    virtual Any visitAddition_substraction(SILParser::Addition_substractionContext* context) override;
 
     virtual Any visitValue_expression(SILParser::Value_expressionContext* context) override;
     virtual Any visitSpecial_value_expression(SILParser::Special_value_expressionContext* context) override;

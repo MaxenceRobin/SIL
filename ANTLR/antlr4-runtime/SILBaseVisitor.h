@@ -47,6 +47,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitParenthesis_expression(SILParser::Parenthesis_expressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitMultiplication_division_modulo(SILParser::Multiplication_division_moduloContext *ctx) override {
     return visitChildren(ctx);
   }

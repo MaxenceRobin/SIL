@@ -143,6 +143,46 @@ Any SILinterpreter::visitExpression_list(SILParser::Expression_listContext *cont
 }
 
 /**
+ * @brief Visits all of the '*', '/' and '%' operators
+ */
+Any SILinterpreter::visitMultiplication_division_modulo(SILParser::Multiplication_division_moduloContext *context)
+{
+    auto& left = visit(context->left).as<RValue>();
+    auto& right = visit(context->right).as<RValue>();
+
+    if (context->STAR())
+    {
+        return left * right;
+    }
+    else if (context->SLASH())
+    {
+        return left / right;
+    }
+    else // PERCENT
+    {
+        return left % right;
+    }
+}
+
+/**
+ * @brief Visits both '+' and '-' operators
+ */
+Any SILinterpreter::visitAddition_substraction(SILParser::Addition_substractionContext *context)
+{
+    auto& left = visit(context->left).as<RValue>();
+    auto& right = visit(context->right).as<RValue>();
+
+    if (context->PLUS())
+    {
+        return left + right;
+    }
+    else // MINUS
+    {
+        return left - right;
+    }
+}
+
+/**
  * @brief Visits an atomic value
  */
 Any SILinterpreter::visitAtomic_value(SILParser::Atomic_valueContext *context)
@@ -163,6 +203,14 @@ Any SILinterpreter::visitAtom(SILParser::AtomContext *context)
     {
         return visitSpecial_value_expression(context->special_value_expression());
     }
+}
+
+/**
+ * @brief Visits an expression represented by another expression surrounded by parenthesis
+ */
+Any SILinterpreter::visitParenthesis_expression(SILParser::Parenthesis_expressionContext *context)
+{
+    return visit(context->expression());
 }
 
 /**

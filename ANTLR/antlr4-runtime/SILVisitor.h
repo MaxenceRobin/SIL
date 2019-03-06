@@ -35,6 +35,8 @@ public:
 
     virtual antlrcpp::Any visitWhile_loop(SILParser::While_loopContext *context) = 0;
 
+    virtual antlrcpp::Any visitParenthesis_expression(SILParser::Parenthesis_expressionContext *context) = 0;
+
     virtual antlrcpp::Any visitMultiplication_division_modulo(SILParser::Multiplication_division_moduloContext *context) = 0;
 
     virtual antlrcpp::Any visitVariable_modulo(SILParser::Variable_moduloContext *context) = 0;

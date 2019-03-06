@@ -115,6 +115,7 @@ while_loop  : WHILE expression Newline? instruction;
 // Expressions ----------------------------------
 // Operators precedence tree
 expression  : atom                                      #atomic_value
+            | L_PAR expression R_PAR                    #parenthesis_expression
             | expression INC                            #post_incrementation
             | expression DEC                            #post_decrementation
             | expression L_PAR expression_list R_PAR    #function_call
@@ -125,15 +126,15 @@ expression  : atom                                      #atomic_value
             | NOT expression        #not
             | expression SEP TYPE   #cast
             
-            | <assoc=right> expression POWER expression         #power
-            | expression op+=(STAR|SLASH|PERCENT) expression    #multiplication_division_modulo
-            | expression op+=(PLUS|MINUS) expression            #addition_substraction
+            | <assoc=right> left=expression POWER right=expression      #power
+            | left=expression op+=(STAR|SLASH|PERCENT) right=expression #multiplication_division_modulo
+            | left=expression op+=(PLUS|MINUS) right=expression         #addition_substraction
             
-            | expression op+=(LT|LEQ|GT|GEQ) expression #comparison
-            | expression op+=(EQU|DIF) expression       #equality_difference
+            | left=expression op+=(LT|LEQ|GT|GEQ) right=expression  #comparison
+            | left=expression op+=(EQU|DIF) right=expression        #equality_difference
 
-            | expression AND expression #and
-            | expression OR expression  #or
+            | left=expression AND right=expression  #and
+            | left=expression OR right=expression   #or
 
             | <assoc=right> Id AFF expression   #variable_affectation
             | Id POW_AFF expression             #variable_power

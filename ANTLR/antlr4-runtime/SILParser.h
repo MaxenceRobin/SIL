@@ -208,15 +208,27 @@ public:
    
   };
 
+  class  Parenthesis_expressionContext : public ExpressionContext {
+  public:
+    Parenthesis_expressionContext(ExpressionContext *ctx);
+
+    antlr4::tree::TerminalNode *L_PAR();
+    ExpressionContext *expression();
+    antlr4::tree::TerminalNode *R_PAR();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
   class  Multiplication_division_moduloContext : public ExpressionContext {
   public:
     Multiplication_division_moduloContext(ExpressionContext *ctx);
 
+    SILParser::ExpressionContext *left = nullptr;
     antlr4::Token *starToken = nullptr;
     std::vector<antlr4::Token *> op;
     antlr4::Token *slashToken = nullptr;
     antlr4::Token *percentToken = nullptr;
-    antlr4::Token *_tset324 = nullptr;
+    antlr4::Token *_tset349 = nullptr;
+    SILParser::ExpressionContext *right = nullptr;
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
     antlr4::tree::TerminalNode *STAR();
@@ -248,12 +260,14 @@ public:
   public:
     ComparisonContext(ExpressionContext *ctx);
 
+    SILParser::ExpressionContext *left = nullptr;
     antlr4::Token *ltToken = nullptr;
     std::vector<antlr4::Token *> op;
     antlr4::Token *leqToken = nullptr;
     antlr4::Token *gtToken = nullptr;
     antlr4::Token *geqToken = nullptr;
-    antlr4::Token *_tset407 = nullptr;
+    antlr4::Token *_tset436 = nullptr;
+    SILParser::ExpressionContext *right = nullptr;
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
     antlr4::tree::TerminalNode *LT();
@@ -267,9 +281,11 @@ public:
   public:
     OrContext(ExpressionContext *ctx);
 
+    SILParser::ExpressionContext *left = nullptr;
+    SILParser::ExpressionContext *right = nullptr;
+    antlr4::tree::TerminalNode *OR();
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
-    antlr4::tree::TerminalNode *OR();
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -285,10 +301,12 @@ public:
   public:
     Equality_differenceContext(ExpressionContext *ctx);
 
+    SILParser::ExpressionContext *left = nullptr;
     antlr4::Token *equToken = nullptr;
     std::vector<antlr4::Token *> op;
     antlr4::Token *difToken = nullptr;
-    antlr4::Token *_tset459 = nullptr;
+    antlr4::Token *_tset490 = nullptr;
+    SILParser::ExpressionContext *right = nullptr;
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
     antlr4::tree::TerminalNode *EQU();
@@ -377,10 +395,12 @@ public:
   public:
     Addition_substractionContext(ExpressionContext *ctx);
 
+    SILParser::ExpressionContext *left = nullptr;
     antlr4::Token *plusToken = nullptr;
     std::vector<antlr4::Token *> op;
     antlr4::Token *minusToken = nullptr;
-    antlr4::Token *_tset369 = nullptr;
+    antlr4::Token *_tset396 = nullptr;
+    SILParser::ExpressionContext *right = nullptr;
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
     antlr4::tree::TerminalNode *PLUS();
@@ -412,9 +432,11 @@ public:
   public:
     AndContext(ExpressionContext *ctx);
 
+    SILParser::ExpressionContext *left = nullptr;
+    SILParser::ExpressionContext *right = nullptr;
+    antlr4::tree::TerminalNode *AND();
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
-    antlr4::tree::TerminalNode *AND();
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -422,9 +444,11 @@ public:
   public:
     PowerContext(ExpressionContext *ctx);
 
+    SILParser::ExpressionContext *left = nullptr;
+    SILParser::ExpressionContext *right = nullptr;
+    antlr4::tree::TerminalNode *POWER();
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
-    antlr4::tree::TerminalNode *POWER();
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
