@@ -12,6 +12,24 @@
 
 using namespace antlr4;
 
+// Template specialisation to correctly cast Variable as RValue
+template <>
+RValue& Any::as<RValue>()
+{
+    if (this->is<Variable>())
+    {
+        return this->as<Variable>();
+    }
+
+    typedef StorageType<RValue> T;
+    auto derived = dynamic_cast<Derived<T>*>(_ptr);
+
+    if (!derived)
+      throw std::bad_cast();
+
+    return derived->value;
+}
+
 /**
  * @brief Initializes the settings of the interpreter
  */
@@ -101,8 +119,7 @@ Any SILinterpreter::visitAction(SILParser::ActionContext *context)
 
         for (auto expression : expressions)
         {
-            // We use the neutral 'visit' method because there is no visitExpression specific method
-            auto& value = visit(expression).as<RValue>();
+            RValue& value = visit(expression).as<RValue>();
             std::cout << value;
         }
     }
@@ -119,9 +136,13 @@ Any SILinterpreter::visitAction(SILParser::ActionContext *context)
     {
         visitWhile_loop(context->while_loop());
     }
-    else // variable creation
+    else if (context->variable_creation())
     {
         visitVariable_creation(context->variable_creation());
+    }
+    else if (context->expression())
+    {
+        visit(context->expression());
     }
 
     return 0;
@@ -143,25 +164,70 @@ Any SILinterpreter::visitExpression_list(SILParser::Expression_listContext *cont
 }
 
 /**
+ * @brief Executes instructions if specified conditions are verrified
+ */
+Any SILinterpreter::visitIf_elif_else(SILParser::If_elif_elseContext *context)
+{
+    if (std::get<bool>(visit(context->if_condition).as<RValue>()))
+    {
+        return visitInstruction(context->if_instruction);
+    }
+
+    unsigned int i = 0;
+    for (auto elifCondition : context->elif_condition)
+    {
+        if (std::get<bool>(visit(elifCondition).as<RValue>()))
+        {
+            return visitInstruction(context->elif_instruction[i]);
+        }
+        i++;
+    }
+
+    if (context->ELSE())
+    {
+        return visitInstruction(context->else_instruction);
+    }
+
+    return 0;
+}
+
+/**
+ * @brief Repeats the instructions as long as the condition is true
+ */
+Any SILinterpreter::visitWhile_loop(SILParser::While_loopContext *context)
+{
+    while (std::get<bool>(visit(context->expression()).as<RValue>()))
+    {
+        visitInstruction(context->instruction());
+    }
+
+    return 0;
+}
+
+/**
  * @brief Visits all of the '*', '/' and '%' operators
  */
 Any SILinterpreter::visitMultiplication_division_modulo(SILParser::Multiplication_division_moduloContext *context)
 {
-    auto& left = visit(context->left).as<RValue>();
-    auto& right = visit(context->right).as<RValue>();
+    RValue result;
+
+    RValue& left = visit(context->left).as<RValue>();
+    RValue& right = visit(context->right).as<RValue>();
 
     if (context->STAR())
     {
-        return left * right;
+        result = left * right;
     }
     else if (context->SLASH())
     {
-        return left / right;
+        result = left / right;
     }
     else // PERCENT
     {
-        return left % right;
+        result = left % right;
     }
+
+    return std::move(result);
 }
 
 /**
@@ -169,17 +235,87 @@ Any SILinterpreter::visitMultiplication_division_modulo(SILParser::Multiplicatio
  */
 Any SILinterpreter::visitAddition_substraction(SILParser::Addition_substractionContext *context)
 {
-    auto& left = visit(context->left).as<RValue>();
-    auto& right = visit(context->right).as<RValue>();
+    RValue result;
+
+    RValue& left = visit(context->left).as<RValue>();
+    RValue& right = visit(context->right).as<RValue>();
 
     if (context->PLUS())
     {
-        return left + right;
+        result = left + right;
     }
     else // MINUS
     {
-        return left - right;
+        result = left - right;
     }
+
+    return std::move(result);
+}
+
+/**
+ * @brief Compares two values and returns a boolean
+ */
+Any SILinterpreter::visitComparison(SILParser::ComparisonContext *context)
+{
+    RValue result;
+
+    RValue& left = visit(context->left).as<RValue>();
+    RValue& right = visit(context->right).as<RValue>();
+
+    if (context->LT())
+    {
+        result = (left < right);
+    }
+    else if (context->LEQ())
+    {
+        result = (left <= right);
+    }
+    else if (context->GT())
+    {
+        result = (left > right);
+    }
+    else // GEQ
+    {
+        result = (left >= right);
+    }
+
+    return std::move(result);
+}
+
+/**
+ * @brief Returns the result of an equality or difference between two expressions
+ */
+Any SILinterpreter::visitEquality_difference(SILParser::Equality_differenceContext *context)
+{
+    RValue result;
+
+    RValue& left = visit(context->left).as<RValue>();
+    RValue& right = visit(context->right).as<RValue>();
+
+    if (context->EQU())
+    {
+        result = (left == right);
+    }
+    else  // DIF
+    {
+        result = (left != right);
+    }
+
+    return std::move(result);
+}
+
+/**
+ * @brief Modifies the value of a variable
+ */
+Any SILinterpreter::visitVariable_affectation(SILParser::Variable_affectationContext *context)
+{
+    const std::string& name = context->Id()->getText();
+    RValue& value = visit(context->expression()).as<RValue>();
+
+    Variable& variable = variables[name];
+    variable.setValue(value);
+
+    return variable;
 }
 
 /**
@@ -218,25 +354,29 @@ Any SILinterpreter::visitParenthesis_expression(SILParser::Parenthesis_expressio
  */
 Any SILinterpreter::visitCast(SILParser::CastContext *context)
 {
+    RValue result;
+
     auto& value = visit(context->expression()).as<RValue>();
     const std::string& type = context->TYPE()->getText();
 
     if (type == "integer")
     {
-        return cast<int>(value);
+        result = cast<int>(value);
     }
     else if (type == "number")
     {
-        return cast<double>(value);
+        result = cast<double>(value);
     }
     else if (type == "string")
     {
-        return cast<std::string>(value);
+        result = cast<std::string>(value);
     }
-    else if (type == "boolean")
+    else // boolean
     {
-        return cast<bool>(value);
+        result = cast<bool>(value);
     }
+
+    return std::move(result);
 }
 
 /**
@@ -246,9 +386,9 @@ Any SILinterpreter::visitValue_expression(SILParser::Value_expressionContext *co
 {
     RValue value;
 
-    if (context->Number())
+    if (context->number())
     {
-        value = std::stoi(context->getText());
+        value = visitNumber(context->number());
     }
     else if (context->String())
     {
@@ -266,7 +406,17 @@ Any SILinterpreter::visitValue_expression(SILParser::Value_expressionContext *co
     }
     else if (context->Id())
     {
-        value = true;
+        const std::string& name = context->Id()->getText();
+
+        if (variables.find(name) != variables.end())
+        {
+            Variable variable = variables[name];
+            return std::move(variable);
+        }
+        else
+        {
+            throw 0;
+        }
     }
     else if (context->function_declaration())
     {
@@ -282,6 +432,26 @@ Any SILinterpreter::visitValue_expression(SILParser::Value_expressionContext *co
     }
 
     return std::move(value);
+}
+
+/**
+ * @brief Returns an integer or a decimal number
+ */
+Any SILinterpreter::visitNumber(SILParser::NumberContext *context)
+{
+    RValue result;
+
+    // If it's a decimal number
+    if (context->DECIMAL_PART())
+    {
+        result = std::stod(context->getText());
+    }
+    else // If it's only an integer
+    {
+        result = std::stoi(context->INTEGER_PART()->getText());
+    }
+
+    return std::move(result);
 }
 
 /**
@@ -309,6 +479,52 @@ Any SILinterpreter::visitSpecial_value_expression(SILParser::Special_value_expre
 
     return std::move(value);
 }
+
+/**
+ * @brief Creates a new variable
+ */
+Any SILinterpreter::visitVariable_creation(SILParser::Variable_creationContext *context)
+{
+    const std::string& name = context->Id()->getText();
+    Variable& newVariable = variables[name];
+
+    if (context->AFF())
+    {
+        auto& value = visit(context->expression()).as<RValue>();
+        newVariable.setValue(value);
+    }
+
+    if (context->TYPE())
+    {
+        const std::string& type = context->TYPE()->getText();
+
+        if (type == "integer")
+        {
+            newVariable.setValueType(Variable::ValueType::Integer);
+        }
+        else if (type == "number")
+        {
+            newVariable.setValueType(Variable::ValueType::Number);
+        }
+        else if (type == "boolean")
+        {
+            newVariable.setValueType(Variable::ValueType::Boolean);
+        }
+        else if (type == "string")
+        {
+            newVariable.setValueType(Variable::ValueType::String);
+        }
+    }
+
+    if (context->CONST())
+    {
+        newVariable.setStatusType(Variable::StatusType::Const);
+    }
+
+    return newVariable;
+}
+
+// Other methods ----------------------------------------------------------------------------------
 
 /**
  * @brief Replaces all the occurences of 'from' by 'to' in the source

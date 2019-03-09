@@ -20,8 +20,8 @@ public:
     LT = 33, GT = 34, LEQ = 35, GEQ = 36, INC = 37, DEC = 38, POW_AFF = 39, 
     PLS_AFF = 40, SUB_AFF = 41, TME_AFF = 42, DIV_AFF = 43, MOD_AFF = 44, 
     DOT = 45, COMMA = 46, SEMICOLON = 47, UNDERSCORE = 48, OR = 49, AND = 50, 
-    NOT = 51, DOLLAR = 52, Number = 53, Id = 54, String = 55, Newline = 56, 
-    Whitespace = 57, Single_comment = 58, Multi_comment = 59
+    NOT = 51, DOLLAR = 52, INTEGER_PART = 53, DECIMAL_PART = 54, Id = 55, 
+    String = 56, Newline = 57, Whitespace = 58, Single_comment = 59, Multi_comment = 60
   };
 
   SILLexer(antlr4::CharStream *input);

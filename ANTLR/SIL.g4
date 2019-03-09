@@ -70,9 +70,8 @@ fragment NON_NULL_DIGIT : '1'..'9';
 fragment LOWER_LETTER   : 'a'..'z';
 fragment UPPER_LETTER   : 'A'..'Z';
 fragment LETTER         : (LOWER_LETTER | UPPER_LETTER);
-fragment INTEGER_PART   : (NON_NULL_DIGIT DIGIT* | '0');
-fragment DECIMAL_PART   : DOT DIGIT+ ([eE] [+-]? DIGIT+)?;
-Number                  : INTEGER_PART (DECIMAL_PART)?;
+INTEGER_PART   : (NON_NULL_DIGIT DIGIT* | '0');
+DECIMAL_PART   : DOT DIGIT+ ([eE] [+-]? DIGIT+)?;
 Id                      : LETTER (LETTER | DIGIT | UNDERSCORE)*;
 String                  : S_QUOTE .*? S_QUOTE
                         | D_QUOTE .*? D_QUOTE;
@@ -100,6 +99,7 @@ action  : OUT expression_list
         | if_elif_else
         | while_loop
         | variable_creation
+        | expression
         ;
 
 expression_list : (expressions+=expression (COMMA expressions+=expression)*)?;
@@ -127,11 +127,11 @@ expression  : atom                                      #atomic_value
             | expression SEP TYPE   #cast
             
             | <assoc=right> left=expression POWER right=expression      #power
-            | left=expression op+=(STAR|SLASH|PERCENT) right=expression #multiplication_division_modulo
-            | left=expression op+=(PLUS|MINUS) right=expression         #addition_substraction
+            | left=expression op=(STAR|SLASH|PERCENT) right=expression  #multiplication_division_modulo
+            | left=expression op=(PLUS|MINUS) right=expression          #addition_substraction
             
-            | left=expression op+=(LT|LEQ|GT|GEQ) right=expression  #comparison
-            | left=expression op+=(EQU|DIF) right=expression        #equality_difference
+            | left=expression op=(LT|LEQ|GT|GEQ) right=expression   #comparison
+            | left=expression op=(EQU|DIF) right=expression         #equality_difference
 
             | left=expression AND right=expression  #and
             | left=expression OR right=expression   #or
@@ -148,13 +148,15 @@ expression  : atom                                      #atomic_value
 atom    : value_expression
         | special_value_expression;
 
-value_expression    : Number
+value_expression    : number
                     | String
                     | Id
                     | function_declaration
                     | TRUE
                     | FALSE
                     ;
+
+number  : INTEGER_PART (DECIMAL_PART)?;
 
 special_value_expression    : IN
                             | RANDOM
@@ -164,8 +166,7 @@ special_value_expression    : IN
                     
 // Functions ------------------------------------
 function_declaration    : FUNCTION Id L_PAR parameter_list R_PAR Newline? block;
-parameter_list          : (variable_declaration (COMMA variable_declaration)*)?;
+parameter_list          : (variable_creation (COMMA variable_creation)*)?;
 
 // Variables ------------------------------------
-variable_declaration    : (VAR|CONST) (SEP TYPE)? Id;
-variable_creation       : variable_declaration (AFF expression)?;
+variable_creation       : (VAR|CONST) (SEP TYPE)? Id (AFF expression)?;

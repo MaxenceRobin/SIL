@@ -10,7 +10,7 @@ RValue operator*(RValue& left, RValue& right)
 {
     return std::visit(
                 overload{
-                    [](auto& left, auto& right) -> RValue { return left * right; },
+                    [](auto& left, auto& right) -> RValue { return std::move(left * right); },
 
                     ERROR_F(std::string)
                 }, left, right);
@@ -20,7 +20,7 @@ RValue operator/(RValue& left, RValue& right)
 {
     return std::visit(
                 overload{
-                    [](auto& left, auto& right) -> RValue { return left / right; },
+                    [](auto& left, auto& right) -> RValue { return std::move(left / right); },
 
                     ERROR_F(std::string)
                 }, left, right);
@@ -30,7 +30,7 @@ RValue operator%(RValue& left, RValue& right)
 {
     return std::visit(
                 overload{
-                    [](int& left, int& right) -> RValue { return left % right; },
+                    [](int& left, int& right) -> RValue { return std::move(left % right); },
 
                     ERROR(auto, auto)
                 }, left, right);
@@ -40,10 +40,10 @@ RValue operator+(RValue& left, RValue& right)
 {
     return std::visit(
                 overload{
-                    [](auto& left, auto& right) -> RValue { return left + right; },
+                    [](auto& left, auto& right) -> RValue { return std::move(left + right); },
                     [](std::string& left, std::string& right) -> RValue { return left + right; },
 
-                    ERROR_B(std::string, auto),
+                    ERROR_B(std::string, auto)
                 }, left, right);
 }
 
@@ -51,9 +51,71 @@ RValue operator-(RValue& left, RValue& right)
 {
     return std::visit(
                 overload{
-                    [](auto& left, auto& right) -> RValue { return  left - right; },
+                    [](auto& left, auto& right) -> RValue { return  std::move(left - right); },
 
-                    ERROR_F(std::string),
+                    ERROR_F(std::string)
+                }, left, right);
+}
+
+RValue operator<(RValue& left, RValue& right)
+{
+    return std::visit(
+                overload{
+                    [](auto& left, auto& right) -> RValue { return  std::move(left < right); },
+
+                    ERROR_F(std::string)
+                }, left, right);
+}
+
+RValue operator<=(RValue& left, RValue& right)
+{
+    return std::visit(
+                overload{
+                    [](auto& left, auto& right) -> RValue { return  std::move(left <= right); },
+
+                    ERROR_F(std::string)
+                }, left, right);
+}
+
+RValue operator>(RValue& left, RValue& right)
+{
+    return std::visit(
+                overload{
+                    [](auto& left, auto& right) -> RValue { return  std::move(left > right); },
+
+                    ERROR_F(std::string)
+                }, left, right);
+}
+
+RValue operator>=(RValue& left, RValue& right)
+{
+    return std::visit(
+                overload{
+                    [](auto& left, auto& right) -> RValue { return  std::move(left >= right); },
+
+                    ERROR_F(std::string)
+                }, left, right);
+}
+
+RValue operator==(RValue& left, RValue& right)
+{
+    return std::visit(
+                overload{
+                    [](auto& left, auto& right) -> RValue { return  std::move(left == right); },
+                    [](std::string& left, std::string& right) -> RValue { return left == right; },
+
+                    ERROR_B(std::string, auto)
+                }, left, right);
+}
+
+RValue operator!=(RValue& left, RValue& right)
+{
+    return std::visit(
+                overload{
+                    [](auto& left, auto& right) -> RValue { return  std::move(left != right); },
+                    [](std::string& left, std::string& right) -> RValue { return left != right; },
+
+                    ERROR_B(std::string, auto)
                 }, left, right);
 }
 

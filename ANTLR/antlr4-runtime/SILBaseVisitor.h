@@ -151,6 +151,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitNumber(SILParser::NumberContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitSpecial_value_expression(SILParser::Special_value_expressionContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -160,10 +164,6 @@ public:
   }
 
   virtual antlrcpp::Any visitParameter_list(SILParser::Parameter_listContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitVariable_declaration(SILParser::Variable_declarationContext *ctx) override {
     return visitChildren(ctx);
   }
 

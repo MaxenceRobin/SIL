@@ -30,12 +30,20 @@ RValue operator%(RValue& left, RValue& right);
 RValue operator+(RValue& left, RValue& right);
 RValue operator-(RValue& left, RValue& right);
 
+RValue operator<(RValue& left, RValue& right);
+RValue operator<=(RValue& left, RValue& right);
+RValue operator>(RValue& left, RValue& right);
+RValue operator>=(RValue& left, RValue& right);
+
+RValue operator==(RValue& left, RValue& right);
+RValue operator!=(RValue& left, RValue& right);
+
 // ------------------------------------------------------------------------------------------------
 
 template <typename T>
 RValue cast(RValue& value)
 {
-    return std::visit([](auto& val) -> RValue { return static_cast<T>(val); }, value);
+    return std::visit([](auto& val) -> RValue { return std::move(static_cast<T>(val)); }, value);
 }
 
 template <>

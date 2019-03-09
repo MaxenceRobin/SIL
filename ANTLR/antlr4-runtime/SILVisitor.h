@@ -87,13 +87,13 @@ public:
 
     virtual antlrcpp::Any visitValue_expression(SILParser::Value_expressionContext *context) = 0;
 
+    virtual antlrcpp::Any visitNumber(SILParser::NumberContext *context) = 0;
+
     virtual antlrcpp::Any visitSpecial_value_expression(SILParser::Special_value_expressionContext *context) = 0;
 
     virtual antlrcpp::Any visitFunction_declaration(SILParser::Function_declarationContext *context) = 0;
 
     virtual antlrcpp::Any visitParameter_list(SILParser::Parameter_listContext *context) = 0;
-
-    virtual antlrcpp::Any visitVariable_declaration(SILParser::Variable_declarationContext *context) = 0;
 
     virtual antlrcpp::Any visitVariable_creation(SILParser::Variable_creationContext *context) = 0;
 

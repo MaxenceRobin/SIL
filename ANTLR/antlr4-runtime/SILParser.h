@@ -20,15 +20,15 @@ public:
     LT = 33, GT = 34, LEQ = 35, GEQ = 36, INC = 37, DEC = 38, POW_AFF = 39, 
     PLS_AFF = 40, SUB_AFF = 41, TME_AFF = 42, DIV_AFF = 43, MOD_AFF = 44, 
     DOT = 45, COMMA = 46, SEMICOLON = 47, UNDERSCORE = 48, OR = 49, AND = 50, 
-    NOT = 51, DOLLAR = 52, Number = 53, Id = 54, String = 55, Newline = 56, 
-    Whitespace = 57, Single_comment = 58, Multi_comment = 59
+    NOT = 51, DOLLAR = 52, INTEGER_PART = 53, DECIMAL_PART = 54, Id = 55, 
+    String = 56, Newline = 57, Whitespace = 58, Single_comment = 59, Multi_comment = 60
   };
 
   enum {
     RuleFile = 0, RuleInstruction_list = 1, RuleInstruction = 2, RuleBlock = 3, 
     RuleAction = 4, RuleExpression_list = 5, RuleIf_elif_else = 6, RuleWhile_loop = 7, 
-    RuleExpression = 8, RuleAtom = 9, RuleValue_expression = 10, RuleSpecial_value_expression = 11, 
-    RuleFunction_declaration = 12, RuleParameter_list = 13, RuleVariable_declaration = 14, 
+    RuleExpression = 8, RuleAtom = 9, RuleValue_expression = 10, RuleNumber = 11, 
+    RuleSpecial_value_expression = 12, RuleFunction_declaration = 13, RuleParameter_list = 14, 
     RuleVariable_creation = 15
   };
 
@@ -53,10 +53,10 @@ public:
   class ExpressionContext;
   class AtomContext;
   class Value_expressionContext;
+  class NumberContext;
   class Special_value_expressionContext;
   class Function_declarationContext;
   class Parameter_listContext;
-  class Variable_declarationContext;
   class Variable_creationContext; 
 
   class  FileContext : public antlr4::ParserRuleContext {
@@ -128,6 +128,7 @@ public:
     If_elif_elseContext *if_elif_else();
     While_loopContext *while_loop();
     Variable_creationContext *variable_creation();
+    ExpressionContext *expression();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -223,11 +224,7 @@ public:
     Multiplication_division_moduloContext(ExpressionContext *ctx);
 
     SILParser::ExpressionContext *left = nullptr;
-    antlr4::Token *starToken = nullptr;
-    std::vector<antlr4::Token *> op;
-    antlr4::Token *slashToken = nullptr;
-    antlr4::Token *percentToken = nullptr;
-    antlr4::Token *_tset349 = nullptr;
+    antlr4::Token *op = nullptr;
     SILParser::ExpressionContext *right = nullptr;
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
@@ -261,12 +258,7 @@ public:
     ComparisonContext(ExpressionContext *ctx);
 
     SILParser::ExpressionContext *left = nullptr;
-    antlr4::Token *ltToken = nullptr;
-    std::vector<antlr4::Token *> op;
-    antlr4::Token *leqToken = nullptr;
-    antlr4::Token *gtToken = nullptr;
-    antlr4::Token *geqToken = nullptr;
-    antlr4::Token *_tset436 = nullptr;
+    antlr4::Token *op = nullptr;
     SILParser::ExpressionContext *right = nullptr;
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
@@ -302,10 +294,7 @@ public:
     Equality_differenceContext(ExpressionContext *ctx);
 
     SILParser::ExpressionContext *left = nullptr;
-    antlr4::Token *equToken = nullptr;
-    std::vector<antlr4::Token *> op;
-    antlr4::Token *difToken = nullptr;
-    antlr4::Token *_tset490 = nullptr;
+    antlr4::Token *op = nullptr;
     SILParser::ExpressionContext *right = nullptr;
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
@@ -396,10 +385,7 @@ public:
     Addition_substractionContext(ExpressionContext *ctx);
 
     SILParser::ExpressionContext *left = nullptr;
-    antlr4::Token *plusToken = nullptr;
-    std::vector<antlr4::Token *> op;
-    antlr4::Token *minusToken = nullptr;
-    antlr4::Token *_tset396 = nullptr;
+    antlr4::Token *op = nullptr;
     SILParser::ExpressionContext *right = nullptr;
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
@@ -500,7 +486,7 @@ public:
   public:
     Value_expressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *Number();
+    NumberContext *number();
     antlr4::tree::TerminalNode *String();
     antlr4::tree::TerminalNode *Id();
     Function_declarationContext *function_declaration();
@@ -512,6 +498,19 @@ public:
   };
 
   Value_expressionContext* value_expression();
+
+  class  NumberContext : public antlr4::ParserRuleContext {
+  public:
+    NumberContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *INTEGER_PART();
+    antlr4::tree::TerminalNode *DECIMAL_PART();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  NumberContext* number();
 
   class  Special_value_expressionContext : public antlr4::ParserRuleContext {
   public:
@@ -549,8 +548,8 @@ public:
   public:
     Parameter_listContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<Variable_declarationContext *> variable_declaration();
-    Variable_declarationContext* variable_declaration(size_t i);
+    std::vector<Variable_creationContext *> variable_creation();
+    Variable_creationContext* variable_creation(size_t i);
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
@@ -560,27 +559,15 @@ public:
 
   Parameter_listContext* parameter_list();
 
-  class  Variable_declarationContext : public antlr4::ParserRuleContext {
+  class  Variable_creationContext : public antlr4::ParserRuleContext {
   public:
-    Variable_declarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    Variable_creationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Id();
     antlr4::tree::TerminalNode *VAR();
     antlr4::tree::TerminalNode *CONST();
     antlr4::tree::TerminalNode *SEP();
     antlr4::tree::TerminalNode *TYPE();
-
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
-
-  Variable_declarationContext* variable_declaration();
-
-  class  Variable_creationContext : public antlr4::ParserRuleContext {
-  public:
-    Variable_creationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    Variable_declarationContext *variable_declaration();
     antlr4::tree::TerminalNode *AFF();
     ExpressionContext *expression();
 
