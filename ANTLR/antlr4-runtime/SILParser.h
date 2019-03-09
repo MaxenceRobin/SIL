@@ -20,8 +20,9 @@ public:
     LT = 33, GT = 34, LEQ = 35, GEQ = 36, INC = 37, DEC = 38, POW_AFF = 39, 
     PLS_AFF = 40, SUB_AFF = 41, TME_AFF = 42, DIV_AFF = 43, MOD_AFF = 44, 
     DOT = 45, COMMA = 46, SEMICOLON = 47, UNDERSCORE = 48, OR = 49, AND = 50, 
-    NOT = 51, DOLLAR = 52, INTEGER_PART = 53, DECIMAL_PART = 54, Id = 55, 
-    String = 56, Newline = 57, Whitespace = 58, Single_comment = 59, Multi_comment = 60
+    NOT = 51, DOLLAR = 52, Q_MARK = 53, PIPE = 54, INTEGER_PART = 55, DECIMAL_PART = 56, 
+    Id = 57, String = 58, Newline = 59, Whitespace = 60, Single_comment = 61, 
+    Multi_comment = 62
   };
 
   enum {
@@ -65,7 +66,6 @@ public:
     virtual size_t getRuleIndex() const override;
     Instruction_listContext *instruction_list();
     antlr4::tree::TerminalNode *EOF();
-    antlr4::tree::TerminalNode *Newline();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -83,6 +83,8 @@ public:
     antlr4::tree::TerminalNode* Newline(size_t i);
     std::vector<InstructionContext *> instruction();
     InstructionContext* instruction(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> SEMICOLON();
+    antlr4::tree::TerminalNode* SEMICOLON(size_t i);
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -110,7 +112,6 @@ public:
     antlr4::tree::TerminalNode *L_BRACKET();
     Instruction_listContext *instruction_list();
     antlr4::tree::TerminalNode *R_BRACKET();
-    antlr4::tree::TerminalNode *Newline();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -209,31 +210,6 @@ public:
    
   };
 
-  class  Parenthesis_expressionContext : public ExpressionContext {
-  public:
-    Parenthesis_expressionContext(ExpressionContext *ctx);
-
-    antlr4::tree::TerminalNode *L_PAR();
-    ExpressionContext *expression();
-    antlr4::tree::TerminalNode *R_PAR();
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  Multiplication_division_moduloContext : public ExpressionContext {
-  public:
-    Multiplication_division_moduloContext(ExpressionContext *ctx);
-
-    SILParser::ExpressionContext *left = nullptr;
-    antlr4::Token *op = nullptr;
-    SILParser::ExpressionContext *right = nullptr;
-    std::vector<ExpressionContext *> expression();
-    ExpressionContext* expression(size_t i);
-    antlr4::tree::TerminalNode *STAR();
-    antlr4::tree::TerminalNode *SLASH();
-    antlr4::tree::TerminalNode *PERCENT();
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
   class  Variable_moduloContext : public ExpressionContext {
   public:
     Variable_moduloContext(ExpressionContext *ctx);
@@ -244,62 +220,11 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  class  Pre_incrementationContext : public ExpressionContext {
-  public:
-    Pre_incrementationContext(ExpressionContext *ctx);
-
-    antlr4::tree::TerminalNode *INC();
-    ExpressionContext *expression();
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  ComparisonContext : public ExpressionContext {
-  public:
-    ComparisonContext(ExpressionContext *ctx);
-
-    SILParser::ExpressionContext *left = nullptr;
-    antlr4::Token *op = nullptr;
-    SILParser::ExpressionContext *right = nullptr;
-    std::vector<ExpressionContext *> expression();
-    ExpressionContext* expression(size_t i);
-    antlr4::tree::TerminalNode *LT();
-    antlr4::tree::TerminalNode *LEQ();
-    antlr4::tree::TerminalNode *GT();
-    antlr4::tree::TerminalNode *GEQ();
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  OrContext : public ExpressionContext {
-  public:
-    OrContext(ExpressionContext *ctx);
-
-    SILParser::ExpressionContext *left = nullptr;
-    SILParser::ExpressionContext *right = nullptr;
-    antlr4::tree::TerminalNode *OR();
-    std::vector<ExpressionContext *> expression();
-    ExpressionContext* expression(size_t i);
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
   class  Atomic_valueContext : public ExpressionContext {
   public:
     Atomic_valueContext(ExpressionContext *ctx);
 
     AtomContext *atom();
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  Equality_differenceContext : public ExpressionContext {
-  public:
-    Equality_differenceContext(ExpressionContext *ctx);
-
-    SILParser::ExpressionContext *left = nullptr;
-    antlr4::Token *op = nullptr;
-    SILParser::ExpressionContext *right = nullptr;
-    std::vector<ExpressionContext *> expression();
-    ExpressionContext* expression(size_t i);
-    antlr4::tree::TerminalNode *EQU();
-    antlr4::tree::TerminalNode *DIF();
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -333,34 +258,6 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  class  Post_incrementationContext : public ExpressionContext {
-  public:
-    Post_incrementationContext(ExpressionContext *ctx);
-
-    ExpressionContext *expression();
-    antlr4::tree::TerminalNode *INC();
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  Variable_divisionContext : public ExpressionContext {
-  public:
-    Variable_divisionContext(ExpressionContext *ctx);
-
-    antlr4::tree::TerminalNode *Id();
-    antlr4::tree::TerminalNode *DIV_AFF();
-    ExpressionContext *expression();
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  Pre_decrementationContext : public ExpressionContext {
-  public:
-    Pre_decrementationContext(ExpressionContext *ctx);
-
-    antlr4::tree::TerminalNode *DEC();
-    ExpressionContext *expression();
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
   class  CastContext : public ExpressionContext {
   public:
     CastContext(ExpressionContext *ctx);
@@ -385,7 +282,6 @@ public:
     Addition_substractionContext(ExpressionContext *ctx);
 
     SILParser::ExpressionContext *left = nullptr;
-    antlr4::Token *op = nullptr;
     SILParser::ExpressionContext *right = nullptr;
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
@@ -400,16 +296,6 @@ public:
 
     antlr4::tree::TerminalNode *Id();
     antlr4::tree::TerminalNode *SUB_AFF();
-    ExpressionContext *expression();
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  Variable_affectationContext : public ExpressionContext {
-  public:
-    Variable_affectationContext(ExpressionContext *ctx);
-
-    antlr4::tree::TerminalNode *Id();
-    antlr4::tree::TerminalNode *AFF();
     ExpressionContext *expression();
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
@@ -448,6 +334,126 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
+  class  Post_decrementationContext : public ExpressionContext {
+  public:
+    Post_decrementationContext(ExpressionContext *ctx);
+
+    ExpressionContext *expression();
+    antlr4::tree::TerminalNode *DEC();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  Parenthesis_expressionContext : public ExpressionContext {
+  public:
+    Parenthesis_expressionContext(ExpressionContext *ctx);
+
+    antlr4::tree::TerminalNode *L_PAR();
+    ExpressionContext *expression();
+    antlr4::tree::TerminalNode *R_PAR();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  Multiplication_division_moduloContext : public ExpressionContext {
+  public:
+    Multiplication_division_moduloContext(ExpressionContext *ctx);
+
+    SILParser::ExpressionContext *left = nullptr;
+    SILParser::ExpressionContext *right = nullptr;
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
+    antlr4::tree::TerminalNode *STAR();
+    antlr4::tree::TerminalNode *SLASH();
+    antlr4::tree::TerminalNode *PERCENT();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  Pre_incrementationContext : public ExpressionContext {
+  public:
+    Pre_incrementationContext(ExpressionContext *ctx);
+
+    antlr4::tree::TerminalNode *INC();
+    ExpressionContext *expression();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  ComparisonContext : public ExpressionContext {
+  public:
+    ComparisonContext(ExpressionContext *ctx);
+
+    SILParser::ExpressionContext *left = nullptr;
+    SILParser::ExpressionContext *right = nullptr;
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
+    antlr4::tree::TerminalNode *LT();
+    antlr4::tree::TerminalNode *LEQ();
+    antlr4::tree::TerminalNode *GT();
+    antlr4::tree::TerminalNode *GEQ();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  OrContext : public ExpressionContext {
+  public:
+    OrContext(ExpressionContext *ctx);
+
+    SILParser::ExpressionContext *left = nullptr;
+    SILParser::ExpressionContext *right = nullptr;
+    antlr4::tree::TerminalNode *OR();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  Equality_differenceContext : public ExpressionContext {
+  public:
+    Equality_differenceContext(ExpressionContext *ctx);
+
+    SILParser::ExpressionContext *left = nullptr;
+    SILParser::ExpressionContext *right = nullptr;
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
+    antlr4::tree::TerminalNode *EQU();
+    antlr4::tree::TerminalNode *DIF();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  Post_incrementationContext : public ExpressionContext {
+  public:
+    Post_incrementationContext(ExpressionContext *ctx);
+
+    ExpressionContext *expression();
+    antlr4::tree::TerminalNode *INC();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  Variable_divisionContext : public ExpressionContext {
+  public:
+    Variable_divisionContext(ExpressionContext *ctx);
+
+    antlr4::tree::TerminalNode *Id();
+    antlr4::tree::TerminalNode *DIV_AFF();
+    ExpressionContext *expression();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  Pre_decrementationContext : public ExpressionContext {
+  public:
+    Pre_decrementationContext(ExpressionContext *ctx);
+
+    antlr4::tree::TerminalNode *DEC();
+    ExpressionContext *expression();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  Variable_affectationContext : public ExpressionContext {
+  public:
+    Variable_affectationContext(ExpressionContext *ctx);
+
+    antlr4::tree::TerminalNode *Id();
+    antlr4::tree::TerminalNode *AFF();
+    ExpressionContext *expression();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
   class  Variable_additionContext : public ExpressionContext {
   public:
     Variable_additionContext(ExpressionContext *ctx);
@@ -458,12 +464,17 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  class  Post_decrementationContext : public ExpressionContext {
+  class  TernaryContext : public ExpressionContext {
   public:
-    Post_decrementationContext(ExpressionContext *ctx);
+    TernaryContext(ExpressionContext *ctx);
 
-    ExpressionContext *expression();
-    antlr4::tree::TerminalNode *DEC();
+    SILParser::ExpressionContext *condition = nullptr;
+    SILParser::ExpressionContext *first = nullptr;
+    SILParser::ExpressionContext *second = nullptr;
+    antlr4::tree::TerminalNode *Q_MARK();
+    antlr4::tree::TerminalNode *PIPE();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 

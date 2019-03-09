@@ -305,6 +305,26 @@ Any SILinterpreter::visitEquality_difference(SILParser::Equality_differenceConte
 }
 
 /**
+ * @brief Returns a value depending on the result of the condition
+ */
+Any SILinterpreter::visitTernary(SILParser::TernaryContext *context)
+{
+    RValue& condition = visit(context->condition).as<RValue>();
+    RValue result;
+
+    if (std::get<bool>(condition))
+    {
+        result = visit(context->first).as<RValue>();
+    }
+    else
+    {
+        result = visit(context->second).as<RValue>();
+    }
+
+    return std::move(result);
+}
+
+/**
  * @brief Modifies the value of a variable
  */
 Any SILinterpreter::visitVariable_affectation(SILParser::Variable_affectationContext *context)

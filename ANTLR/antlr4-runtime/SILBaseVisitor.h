@@ -47,35 +47,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitParenthesis_expression(SILParser::Parenthesis_expressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitMultiplication_division_modulo(SILParser::Multiplication_division_moduloContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
   virtual antlrcpp::Any visitVariable_modulo(SILParser::Variable_moduloContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitPre_incrementation(SILParser::Pre_incrementationContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitComparison(SILParser::ComparisonContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitOr(SILParser::OrContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
   virtual antlrcpp::Any visitAtomic_value(SILParser::Atomic_valueContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitEquality_difference(SILParser::Equality_differenceContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -88,18 +64,6 @@ public:
   }
 
   virtual antlrcpp::Any visitUnary_minus(SILParser::Unary_minusContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitPost_incrementation(SILParser::Post_incrementationContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitVariable_division(SILParser::Variable_divisionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitPre_decrementation(SILParser::Pre_decrementationContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -119,10 +83,6 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitVariable_affectation(SILParser::Variable_affectationContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
   virtual antlrcpp::Any visitAnd(SILParser::AndContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -135,11 +95,55 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitPost_decrementation(SILParser::Post_decrementationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitParenthesis_expression(SILParser::Parenthesis_expressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitMultiplication_division_modulo(SILParser::Multiplication_division_moduloContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitPre_incrementation(SILParser::Pre_incrementationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitComparison(SILParser::ComparisonContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitOr(SILParser::OrContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitEquality_difference(SILParser::Equality_differenceContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitPost_incrementation(SILParser::Post_incrementationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitVariable_division(SILParser::Variable_divisionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitPre_decrementation(SILParser::Pre_decrementationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitVariable_affectation(SILParser::Variable_affectationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitVariable_addition(SILParser::Variable_additionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitPost_decrementation(SILParser::Post_decrementationContext *ctx) override {
+  virtual antlrcpp::Any visitTernary(SILParser::TernaryContext *ctx) override {
     return visitChildren(ctx);
   }
 

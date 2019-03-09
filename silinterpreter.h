@@ -46,6 +46,8 @@ private:
     virtual Any visitComparison(SILParser::ComparisonContext* context) override;
     virtual Any visitEquality_difference(SILParser::Equality_differenceContext* context) override;
 
+    virtual Any visitTernary(SILParser::TernaryContext* context) override;
+
     virtual Any visitVariable_affectation(SILParser::Variable_affectationContext* context) override;
 
     virtual Any visitValue_expression(SILParser::Value_expressionContext* context) override;

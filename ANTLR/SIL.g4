@@ -63,6 +63,8 @@ OR          : 'or';
 AND         : 'and';
 NOT         : 'not';
 DOLLAR      : '$';
+Q_MARK      : '?';
+PIPE        : '|';
 
 // Values ---------------------------------------
 fragment DIGIT          : '0'..'9';
@@ -79,20 +81,22 @@ String                  : S_QUOTE .*? S_QUOTE
 // Specials -------------------------------------
 Newline     : ('\r'? '\n' | '\r')+;
 Whitespace  : (' ' | '\t')+ -> skip;
-Single_comment  : '//' ~('\n' | '\r')* -> skip;
+Single_comment  : '//' ~('\n')*  '\n'-> skip;
 Multi_comment   : '/*' .*? '*/' -> skip;
 
 // Parser -----------------------------------------------------------------------------------------
 
 // General file description ---------------------
-file                : Newline? instruction_list EOF;
-instruction_list    : (instructions+=instruction Newline)* instructions+=instruction?;
+file                : instruction_list EOF;
+//instruction_list    : (instructions+=instruction Newline)* instructions+=instruction?;
+//instruction_list    : (instructions+=instruction (Newline|SEMICOLON))* instructions+=instruction?;
+instruction_list    : (instructions+=instruction (SEMICOLON instructions+=instruction)* | Newline)*;
 
 // List of possible instructions ----------------
 instruction : block
             | action;
 
-block   : L_BRACKET Newline? instruction_list R_BRACKET;
+block   : L_BRACKET instruction_list R_BRACKET;
 
 action  : OUT expression_list
         | PAUSE
@@ -126,15 +130,17 @@ expression  : atom                                      #atomic_value
             | NOT expression        #not
             | expression SEP TYPE   #cast
             
-            | <assoc=right> left=expression POWER right=expression      #power
-            | left=expression op=(STAR|SLASH|PERCENT) right=expression  #multiplication_division_modulo
-            | left=expression op=(PLUS|MINUS) right=expression          #addition_substraction
+            | <assoc=right> left=expression POWER right=expression  #power
+            | left=expression (STAR|SLASH|PERCENT) right=expression #multiplication_division_modulo
+            | left=expression (PLUS|MINUS) right=expression         #addition_substraction
             
-            | left=expression op=(LT|LEQ|GT|GEQ) right=expression   #comparison
-            | left=expression op=(EQU|DIF) right=expression         #equality_difference
+            | left=expression (LT|LEQ|GT|GEQ) right=expression  #comparison
+            | left=expression (EQU|DIF) right=expression        #equality_difference
 
             | left=expression AND right=expression  #and
             | left=expression OR right=expression   #or
+
+            | condition=expression Q_MARK first=expression PIPE second=expression   #ternary
 
             | <assoc=right> Id AFF expression   #variable_affectation
             | Id POW_AFF expression             #variable_power
