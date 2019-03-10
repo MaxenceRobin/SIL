@@ -13,9 +13,10 @@ int main(int argc, char* argv[])
         {
             compiler.execute(argv[1]);
         }
-        catch (int e)
+        catch (SILexception e)
         {
-            std::cout << "Une erreur est survenue..." << std::endl;
+            std::cout << "Erreur :" << std::endl;
+            std::cout << e.getMessage() << std::endl;
             getchar();
         }
 

@@ -438,7 +438,7 @@ Any SILinterpreter::visitValue_expression(SILParser::Value_expressionContext *co
         }
         else
         {
-            throw 0;
+            throw SILexception("La variable <" + name + "> n'existe pas");
         }
     }
     else if (context->function_declaration())
@@ -549,7 +549,7 @@ Any SILinterpreter::visitVariable_creation(SILParser::Variable_creationContext *
         // A constant must be initialized at the creation
         if (!context->AFF())
         {
-            throw 0;
+            throw SILexception("Une constante doit etre initialisee a la creation");
         }
 
         newVariable.setStatusType(Variable::StatusType::Const);

@@ -14,7 +14,8 @@ SOURCES += \
     programcontext.cpp \
     silinterpreter.cpp \
     rvalue.cpp \
-    variable.cpp
+    variable.cpp \
+    silexception.cpp
 
 HEADERS += \
     ANTLR/antlr4-runtime/SILBaseVisitor.h \
@@ -24,7 +25,8 @@ HEADERS += \
     programcontext.h \
     rvalue.h \
     silinterpreter.h \
-    variable.h
+    variable.h \
+    silexception.h
 
 # ANTLR runtime
 

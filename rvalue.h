@@ -5,14 +5,16 @@
 #include <variant>
 #include <functional>
 
+#include "silexception.h"
 
-#define ERROR_F(type) ERROR(type, type),\
-                      ERROR_B(type, auto)
 
-#define ERROR_B(tleft, tright) ERROR(tleft, tright),\
-                               ERROR(tright, tleft)
+#define ERROR_F(type, message) ERROR(type, type, message),\
+                      ERROR_B(type, auto, message)
 
-#define ERROR(tleft, tright) [](tleft&, tright&) -> RValue { throw 0; }
+#define ERROR_B(tleft, tright, message) ERROR(tleft, tright, message),\
+                               ERROR(tright, tleft, message)
+
+#define ERROR(tleft, tright, message) [](tleft&, tright&) -> RValue { throw SILexception(message); }
 
 typedef std::variant<int, double, bool, std::string> RValue;
 

@@ -12,7 +12,7 @@ RValue operator*(RValue& left, RValue& right)
                 overload{
                     [](auto& left, auto& right) -> RValue { return std::move(left * right); },
 
-                    ERROR_F(std::string)
+                    ERROR_F(std::string, "Multiplication entre chaines de caracteres impossible")
                 }, left, right);
 }
 
@@ -22,7 +22,7 @@ RValue operator/(RValue& left, RValue& right)
                 overload{
                     [](auto& left, auto& right) -> RValue { return std::move(left / right); },
 
-                    ERROR_F(std::string)
+                    ERROR_F(std::string, "Division entre chaines de caracteres impossible")
                 }, left, right);
 }
 
@@ -32,7 +32,7 @@ RValue operator%(RValue& left, RValue& right)
                 overload{
                     [](int& left, int& right) -> RValue { return std::move(left % right); },
 
-                    ERROR(auto, auto)
+                    ERROR(auto, auto, "Modulo entre deux valeurs non entieres impossible")
                 }, left, right);
 }
 
@@ -43,7 +43,7 @@ RValue operator+(RValue& left, RValue& right)
                     [](auto& left, auto& right) -> RValue { return std::move(left + right); },
                     [](std::string& left, std::string& right) -> RValue { return left + right; },
 
-                    ERROR_B(std::string, auto)
+                    ERROR_B(std::string, auto, "Addition entre une chaine de caracteres et une autre valeur impossible")
                 }, left, right);
 }
 
@@ -53,7 +53,7 @@ RValue operator-(RValue& left, RValue& right)
                 overload{
                     [](auto& left, auto& right) -> RValue { return  std::move(left - right); },
 
-                    ERROR_F(std::string)
+                    ERROR_F(std::string, "Soustraction entre une chaine de caracteres et une autre valeur")
                 }, left, right);
 }
 
@@ -63,7 +63,7 @@ RValue operator<(RValue& left, RValue& right)
                 overload{
                     [](auto& left, auto& right) -> RValue { return  std::move(left < right); },
 
-                    ERROR_F(std::string)
+                    ERROR_F(std::string, "Comparaison '<' entre une chaine de caracteres et une autre valeur impossible")
                 }, left, right);
 }
 
@@ -73,7 +73,7 @@ RValue operator<=(RValue& left, RValue& right)
                 overload{
                     [](auto& left, auto& right) -> RValue { return  std::move(left <= right); },
 
-                    ERROR_F(std::string)
+                    ERROR_F(std::string, "Comparaison '<=' entre une chaine de caracteres et une autre valeur impossible")
                 }, left, right);
 }
 
@@ -83,7 +83,7 @@ RValue operator>(RValue& left, RValue& right)
                 overload{
                     [](auto& left, auto& right) -> RValue { return  std::move(left > right); },
 
-                    ERROR_F(std::string)
+                    ERROR_F(std::string, "Comparaison '>' entre une chaine de caracteres et une autre valeur impossible")
                 }, left, right);
 }
 
@@ -93,7 +93,7 @@ RValue operator>=(RValue& left, RValue& right)
                 overload{
                     [](auto& left, auto& right) -> RValue { return  std::move(left >= right); },
 
-                    ERROR_F(std::string)
+                    ERROR_F(std::string, "Comparaison '>=' entre une chaine de caracteres et une autre valeur impossible")
                 }, left, right);
 }
 
@@ -104,7 +104,7 @@ RValue operator==(RValue& left, RValue& right)
                     [](auto& left, auto& right) -> RValue { return  std::move(left == right); },
                     [](std::string& left, std::string& right) -> RValue { return left == right; },
 
-                    ERROR_B(std::string, auto)
+                    ERROR_B(std::string, auto, "Test d'egualite entre une chaine de caracteres et une autre valeur impossible")
                 }, left, right);
 }
 
@@ -115,7 +115,7 @@ RValue operator!=(RValue& left, RValue& right)
                     [](auto& left, auto& right) -> RValue { return  std::move(left != right); },
                     [](std::string& left, std::string& right) -> RValue { return left != right; },
 
-                    ERROR_B(std::string, auto)
+                    ERROR_B(std::string, auto, "Test de difference entre une chaine de caracteres et une autre valeur impossible")
                 }, left, right);
 }
 

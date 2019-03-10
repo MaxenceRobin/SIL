@@ -1,4 +1,5 @@
 #include "variable.h"
+#include "silexception.h"
 
 /*
  * This table represent the non obvious compatible types
@@ -69,7 +70,7 @@ Variable& Variable::setValue(const RValue &value)
     // An exception is thrown if the user tries to modify a constant
     if (statusType == Variable::StatusType::Const)
     {
-        throw 0;
+        throw SILexception("Impossible de modifier constante");
     }
 
     if (valueType != Variable::ValueType::Any)
@@ -80,7 +81,7 @@ Variable& Variable::setValue(const RValue &value)
             // Neither indirectly compatible
             if (compatibleTypes.find({index(), value.index()}) == compatibleTypes.end())
             {
-                throw 0;
+                throw SILexception("Affectation d'une mauvaise valeur a une variable typee");
             }
         }
     }
