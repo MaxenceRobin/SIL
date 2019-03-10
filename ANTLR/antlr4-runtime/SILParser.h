@@ -27,7 +27,7 @@ public:
 
   enum {
     RuleFile = 0, RuleInstruction_list = 1, RuleInstruction = 2, RuleBlock = 3, 
-    RuleAction = 4, RuleExpression_list = 5, RuleIf_elif_else = 6, RuleWhile_loop = 7, 
+    RuleAction = 4, RuleExpression_list = 5, RuleIf_else = 6, RuleWhile_loop = 7, 
     RuleExpression = 8, RuleAtom = 9, RuleValue_expression = 10, RuleNumber = 11, 
     RuleSpecial_value_expression = 12, RuleFunction_declaration = 13, RuleParameter_list = 14, 
     RuleVariable_creation = 15
@@ -49,7 +49,7 @@ public:
   class BlockContext;
   class ActionContext;
   class Expression_listContext;
-  class If_elif_elseContext;
+  class If_elseContext;
   class While_loopContext;
   class ExpressionContext;
   class AtomContext;
@@ -130,7 +130,7 @@ public:
     antlr4::tree::TerminalNode *OUT();
     Expression_listContext *expression_list();
     antlr4::tree::TerminalNode *PAUSE();
-    If_elif_elseContext *if_elif_else();
+    If_elseContext *if_else();
     While_loopContext *while_loop();
     Variable_creationContext *variable_creation();
     ExpressionContext *expression();
@@ -158,33 +158,26 @@ public:
 
   Expression_listContext* expression_list();
 
-  class  If_elif_elseContext : public antlr4::ParserRuleContext {
+  class  If_elseContext : public antlr4::ParserRuleContext {
   public:
     SILParser::ExpressionContext *if_condition = nullptr;;
     SILParser::InstructionContext *if_instruction = nullptr;;
-    SILParser::ExpressionContext *expressionContext = nullptr;;
-    std::vector<ExpressionContext *> elif_condition;;
-    SILParser::InstructionContext *instructionContext = nullptr;;
-    std::vector<InstructionContext *> elif_instruction;;
     SILParser::InstructionContext *else_instruction = nullptr;;
-    If_elif_elseContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    If_elseContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IF();
-    std::vector<ExpressionContext *> expression();
-    ExpressionContext* expression(size_t i);
+    ExpressionContext *expression();
     std::vector<InstructionContext *> instruction();
     InstructionContext* instruction(size_t i);
     std::vector<antlr4::tree::TerminalNode *> Newline();
     antlr4::tree::TerminalNode* Newline(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> ELIF();
-    antlr4::tree::TerminalNode* ELIF(size_t i);
     antlr4::tree::TerminalNode *ELSE();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
 
-  If_elif_elseContext* if_elif_else();
+  If_elseContext* if_else();
 
   class  While_loopContext : public antlr4::ParserRuleContext {
   public:
@@ -218,9 +211,11 @@ public:
   public:
     Variable_moduloContext(ExpressionContext *ctx);
 
-    antlr4::tree::TerminalNode *Id();
+    SILParser::ExpressionContext *ID = nullptr;
+    SILParser::ExpressionContext *value = nullptr;
     antlr4::tree::TerminalNode *MOD_AFF();
-    ExpressionContext *expression();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -247,9 +242,11 @@ public:
   public:
     Variable_multiplicationContext(ExpressionContext *ctx);
 
-    antlr4::tree::TerminalNode *Id();
+    SILParser::ExpressionContext *ID = nullptr;
+    SILParser::ExpressionContext *value = nullptr;
     antlr4::tree::TerminalNode *TME_AFF();
-    ExpressionContext *expression();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -298,9 +295,11 @@ public:
   public:
     Variable_substractionContext(ExpressionContext *ctx);
 
-    antlr4::tree::TerminalNode *Id();
+    SILParser::ExpressionContext *ID = nullptr;
+    SILParser::ExpressionContext *value = nullptr;
     antlr4::tree::TerminalNode *SUB_AFF();
-    ExpressionContext *expression();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -332,9 +331,11 @@ public:
   public:
     Variable_powerContext(ExpressionContext *ctx);
 
-    antlr4::tree::TerminalNode *Id();
+    SILParser::ExpressionContext *ID = nullptr;
+    SILParser::ExpressionContext *value = nullptr;
     antlr4::tree::TerminalNode *POW_AFF();
-    ExpressionContext *expression();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -433,9 +434,11 @@ public:
   public:
     Variable_divisionContext(ExpressionContext *ctx);
 
-    antlr4::tree::TerminalNode *Id();
+    SILParser::ExpressionContext *ID = nullptr;
+    SILParser::ExpressionContext *value = nullptr;
     antlr4::tree::TerminalNode *DIV_AFF();
-    ExpressionContext *expression();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -452,9 +455,11 @@ public:
   public:
     Variable_affectationContext(ExpressionContext *ctx);
 
-    antlr4::tree::TerminalNode *Id();
+    SILParser::ExpressionContext *ID = nullptr;
+    SILParser::ExpressionContext *value = nullptr;
     antlr4::tree::TerminalNode *AFF();
-    ExpressionContext *expression();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -462,9 +467,11 @@ public:
   public:
     Variable_additionContext(ExpressionContext *ctx);
 
-    antlr4::tree::TerminalNode *Id();
+    SILParser::ExpressionContext *ID = nullptr;
+    SILParser::ExpressionContext *value = nullptr;
     antlr4::tree::TerminalNode *PLS_AFF();
-    ExpressionContext *expression();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 

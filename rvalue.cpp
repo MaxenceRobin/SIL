@@ -6,6 +6,17 @@ std::ostream& operator<<(std::ostream& stream, RValue& value)
     return stream;
 }
 
+RValue negate(const RValue& value)
+{
+    return std::visit(
+                overload{
+                    [](auto& val) -> RValue { return std::move(-val); },
+
+                    [](const std::string&) -> RValue { throw SILexception("L'operateur '-' unaire n'est pas compatible avec les chaines de caracteres"); },
+                    [](const bool&) -> RValue { throw SILexception("L'operateur '-' unaire n'est pas compatible avec les booleens"); }
+                }, value);
+}
+
 RValue operator*(RValue& left, RValue& right)
 {
     return std::visit(
@@ -22,7 +33,9 @@ RValue operator/(RValue& left, RValue& right)
                 overload{
                     [](auto& left, auto& right) -> RValue { return std::move(left / right); },
 
-                    ERROR_F(std::string, "Division entre chaines de caracteres impossible")
+                    ERROR_F(std::string, "Division entre une chaine de caractere et une autre valeur impossible"),
+                    ERROR_F(bool, "Division entre un booleen et une autre valeur impossible"),
+                    ERROR_B(std::string, bool, "Division entre une chaine de caractere et une autre valeur impossible")
                 }, left, right);
 }
 
@@ -63,7 +76,9 @@ RValue operator<(RValue& left, RValue& right)
                 overload{
                     [](auto& left, auto& right) -> RValue { return  std::move(left < right); },
 
-                    ERROR_F(std::string, "Comparaison '<' entre une chaine de caracteres et une autre valeur impossible")
+                    ERROR_F(std::string, "Comparaison '<' entre une chaine de caracteres et une autre valeur impossible"),
+                    ERROR_F(bool, "Comparaison '<' entre un booleen et une autre valeur impossible"),
+                    ERROR_B(std::string, bool, "Comparaison '<' entre une chaine de caracteres et une autre valeur impossible")
                 }, left, right);
 }
 
@@ -73,7 +88,9 @@ RValue operator<=(RValue& left, RValue& right)
                 overload{
                     [](auto& left, auto& right) -> RValue { return  std::move(left <= right); },
 
-                    ERROR_F(std::string, "Comparaison '<=' entre une chaine de caracteres et une autre valeur impossible")
+                    ERROR_F(std::string, "Comparaison '<=' entre une chaine de caracteres et une autre valeur impossible"),
+                    ERROR_F(bool, "Comparaison '<=' entre un booleen et une autre valeur impossible"),
+                    ERROR_B(std::string, bool, "Comparaison '<=' entre une chaine de caracteres et une autre valeur impossible")
                 }, left, right);
 }
 
@@ -83,7 +100,9 @@ RValue operator>(RValue& left, RValue& right)
                 overload{
                     [](auto& left, auto& right) -> RValue { return  std::move(left > right); },
 
-                    ERROR_F(std::string, "Comparaison '>' entre une chaine de caracteres et une autre valeur impossible")
+                    ERROR_F(std::string, "Comparaison '>' entre une chaine de caracteres et une autre valeur impossible"),
+                    ERROR_F(bool, "Comparaison '>' entre un booleen et une autre valeur impossible"),
+                    ERROR_B(std::string, bool, "Comparaison '>' entre une chaine de caracteres et une autre valeur impossible")
                 }, left, right);
 }
 
@@ -93,7 +112,9 @@ RValue operator>=(RValue& left, RValue& right)
                 overload{
                     [](auto& left, auto& right) -> RValue { return  std::move(left >= right); },
 
-                    ERROR_F(std::string, "Comparaison '>=' entre une chaine de caracteres et une autre valeur impossible")
+                    ERROR_F(std::string, "Comparaison '>=' entre une chaine de caracteres et une autre valeur impossible"),
+                    ERROR_F(bool, "Comparaison '>=' entre un booleen et une autre valeur impossible"),
+                    ERROR_B(std::string, bool, "Comparaison '>+' entre une chaine de caracteres et une autre valeur impossible")
                 }, left, right);
 }
 

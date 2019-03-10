@@ -39,7 +39,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitIf_elif_else(SILParser::If_elif_elseContext *ctx) override {
+  virtual antlrcpp::Any visitIf_else(SILParser::If_elseContext *ctx) override {
     return visitChildren(ctx);
   }
 

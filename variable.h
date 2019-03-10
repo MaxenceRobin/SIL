@@ -48,4 +48,17 @@ private:
     static CompatibilityTable compatibleTypes;
 };
 
+/**
+ * @brief Reference to a variable
+ */
+class RVariable : public std::string
+{
+public:
+
+    RVariable(const std::string& value)
+        : std::string(value)
+    {
+    }
+};
+
 #endif // VARIABLE_H

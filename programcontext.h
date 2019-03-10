@@ -13,7 +13,8 @@ typedef std::vector<ContextBlock> ContextBlockList;
 class ProgramContext
 {
 public:
-    ProgramContext();
+
+    static ProgramContext& getInstance();
 
     void addContext();
     void removeContext();
@@ -23,6 +24,10 @@ public:
 
     Variable& createVariable(const std::string& name);
     Variable& getVariable(const std::string& name);
+
+private:
+
+    ProgramContext();
 
 private:
     std::vector<ContextBlockList> variablesContexts;

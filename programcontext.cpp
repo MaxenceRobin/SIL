@@ -11,6 +11,12 @@ ProgramContext::ProgramContext()
     addContext();
 }
 
+ProgramContext& ProgramContext::getInstance()
+{
+    static ProgramContext instance;
+    return instance;
+}
+
 // Methods ----------------------------------------------------------------------------------------
 
 /**
@@ -71,5 +77,5 @@ Variable& ProgramContext::getVariable(const std::string &name)
         }
     }
 
-    throw SILexception("La variable <" + name + "> n'existe pas");
+    throw SILexception("La variable '" + name + "' n'existe pas");
 }

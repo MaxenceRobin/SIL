@@ -31,7 +31,7 @@ public:
 
     virtual antlrcpp::Any visitExpression_list(SILParser::Expression_listContext *context) = 0;
 
-    virtual antlrcpp::Any visitIf_elif_else(SILParser::If_elif_elseContext *context) = 0;
+    virtual antlrcpp::Any visitIf_else(SILParser::If_elseContext *context) = 0;
 
     virtual antlrcpp::Any visitWhile_loop(SILParser::While_loopContext *context) = 0;
 

@@ -101,7 +101,7 @@ block   : L_BRACKET Newline? instruction_list Newline? R_BRACKET;
 
 action  : OUT expression_list
         | PAUSE
-        | if_elif_else
+        | if_else
         | while_loop
         | variable_creation
         | expression
@@ -110,10 +110,9 @@ action  : OUT expression_list
 expression_list : (expressions+=expression (COMMA expressions+=expression)*)?;
 
         
-if_elif_else  : IF if_condition=expression Newline? if_instruction=instruction Newline?
-                (ELIF elif_condition+=expression Newline? elif_instruction+=instruction Newline?)*
-                (ELSE Newline? else_instruction=instruction)?
-                ;
+if_else  : IF if_condition=expression Newline? if_instruction=instruction Newline?
+            (ELSE Newline? else_instruction=instruction)?
+            ;
 
 while_loop  : WHILE expression Newline? instruction;
 
@@ -143,13 +142,13 @@ expression  : atom                                      #atomic_value
 
             | condition=expression Q_MARK first=expression PIPE second=expression   #ternary
 
-            | <assoc=right> Id AFF expression   #variable_affectation
-            | Id POW_AFF expression             #variable_power
-            | Id TME_AFF expression             #variable_multiplication
-            | Id DIV_AFF expression             #variable_division
-            | Id MOD_AFF expression             #variable_modulo
-            | Id PLS_AFF expression             #variable_addition
-            | Id SUB_AFF expression             #variable_substraction
+            | <assoc=right> ID=expression AFF value=expression  #variable_affectation
+            | ID=expression POW_AFF value=expression            #variable_power
+            | ID=expression TME_AFF value=expression            #variable_multiplication
+            | ID=expression DIV_AFF value=expression            #variable_division
+            | ID=expression MOD_AFF value=expression            #variable_modulo
+            | ID=expression PLS_AFF value=expression            #variable_addition
+            | ID=expression SUB_AFF value=expression            #variable_substraction
             ;
 
 atom    : value_expression

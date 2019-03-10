@@ -25,6 +25,9 @@ template<class... Ts> overload(Ts...) -> overload<Ts...>;
 
 std::ostream& operator<<(std::ostream& stream, RValue& value);
 
+// Unary minus operator
+RValue negate(const RValue& value);
+
 RValue operator*(RValue& left, RValue& right);
 RValue operator/(RValue& left, RValue& right);
 RValue operator%(RValue& left, RValue& right);

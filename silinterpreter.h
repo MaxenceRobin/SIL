@@ -29,13 +29,17 @@ private:
 
     virtual Any visitExpression_list(SILParser::Expression_listContext* context) override;
 
-    virtual Any visitIf_elif_else(SILParser::If_elif_elseContext* context) override;
+    virtual Any visitIf_else(SILParser::If_elseContext* context) override;
     virtual Any visitWhile_loop(SILParser::While_loopContext* context) override;
 
     virtual Any visitAtomic_value(SILParser::Atomic_valueContext* context) override;
     virtual Any visitAtom(SILParser::AtomContext* context) override;
     virtual Any visitParenthesis_expression(SILParser::Parenthesis_expressionContext* context) override;
-
+    virtual Any visitPost_incrementation(SILParser::Post_incrementationContext* context) override;
+    virtual Any visitPost_decrementation(SILParser::Post_decrementationContext* context) override;
+    virtual Any visitPre_incrementation(SILParser::Pre_incrementationContext* context) override;
+    virtual Any visitPre_decrementation(SILParser::Pre_decrementationContext* context) override;
+    virtual Any visitUnary_minus(SILParser::Unary_minusContext* context) override;
     virtual Any visitCast(SILParser::CastContext* context) override;
 
     virtual Any visitMultiplication_division_modulo(SILParser::Multiplication_division_moduloContext* context) override;
@@ -59,7 +63,6 @@ private:
 
 private:
 
-    ProgramContext variablesContexts;
     std::unordered_map<std::string, Variable> variables;
 };
 

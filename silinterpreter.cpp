@@ -12,13 +12,14 @@
 
 using namespace antlr4;
 
-// Template specialisation to correctly cast Variable as RValue
+// Template specialisation to correctly cast as RValue
 template <>
 RValue& Any::as<RValue>()
 {
-    if (this->is<Variable>())
+    if (is<RVariable>())
     {
-        return this->as<Variable>();
+        RVariable& name = as<RVariable>();
+        return ProgramContext::getInstance().getVariable(name);
     }
 
     typedef StorageType<RValue> T;
@@ -106,9 +107,9 @@ Any SILinterpreter::visitInstruction(SILParser::InstructionContext *context)
  */
 Any SILinterpreter::visitBlock(SILParser::BlockContext *context)
 {
-    variablesContexts.addBlock();
+    ProgramContext::getInstance().addBlock();
     visitInstruction_list(context->instruction_list());
-    variablesContexts.removeBlock();
+    ProgramContext::getInstance().removeBlock();
 
     return 0;
 }
@@ -133,9 +134,9 @@ Any SILinterpreter::visitAction(SILParser::ActionContext *context)
         // Waits until the user presses 'Enter'
         getchar();
     }
-    else if (context->if_elif_else())
+    else if (context->if_else())
     {
-        visitIf_elif_else(context->if_elif_else());
+        visitIf_else(context->if_else());
     }
     else if (context->while_loop())
     {
@@ -171,21 +172,11 @@ Any SILinterpreter::visitExpression_list(SILParser::Expression_listContext *cont
 /**
  * @brief Executes instructions if specified conditions are verrified
  */
-Any SILinterpreter::visitIf_elif_else(SILParser::If_elif_elseContext *context)
+Any SILinterpreter::visitIf_else(SILParser::If_elseContext *context)
 {
     if (std::get<bool>(visit(context->if_condition).as<RValue>()))
     {
         return visitInstruction(context->if_instruction);
-    }
-
-    unsigned int i = 0;
-    for (auto elifCondition : context->elif_condition)
-    {
-        if (std::get<bool>(visit(elifCondition).as<RValue>()))
-        {
-            return visitInstruction(context->elif_instruction[i]);
-        }
-        i++;
     }
 
     if (context->ELSE())
@@ -207,6 +198,133 @@ Any SILinterpreter::visitWhile_loop(SILParser::While_loopContext *context)
     }
 
     return 0;
+}
+
+/**
+ * @brief Visits an atomic value
+ */
+Any SILinterpreter::visitAtomic_value(SILParser::Atomic_valueContext *context)
+{
+    return visitAtom(context->atom());
+}
+
+/**
+ * @brief Visits an atomic expression
+ */
+Any SILinterpreter::visitAtom(SILParser::AtomContext *context)
+{
+    if (context->value_expression())
+    {
+        return visitValue_expression(context->value_expression());
+    }
+    else // Special value expression
+    {
+        return visitSpecial_value_expression(context->special_value_expression());
+    }
+}
+
+/**
+ * @brief Visits an expression represented by another expression surrounded by parenthesis
+ */
+Any SILinterpreter::visitParenthesis_expression(SILParser::Parenthesis_expressionContext *context)
+{
+    return visit(context->expression());
+}
+
+/**
+ * @brief Increments a variable and returns its value before it was modified
+ */
+Any SILinterpreter::visitPost_incrementation(SILParser::Post_incrementationContext *context)
+{
+    RVariable& name = visit(context->expression()).as<RVariable>();
+    Variable& variable = ProgramContext::getInstance().getVariable(name);
+    RValue value = variable;
+
+    RValue result = value + (RValue() = 1);
+    variable.setValue(result);
+
+    return std::move(value);
+}
+
+/**
+ * @brief Decrements a variable and returns its value before it was modified
+ */
+Any SILinterpreter::visitPost_decrementation(SILParser::Post_decrementationContext *context)
+{
+    RVariable name = visit(context->expression()).as<RVariable>();
+    Variable& variable = ProgramContext::getInstance().getVariable(name);
+    RValue value = variable;
+
+    RValue result = value - (RValue() = 1);
+    variable.setValue(result);
+
+    return std::move(value);
+}
+
+/**
+ * @brief Increments a variable and returns its value
+ */
+Any SILinterpreter::visitPre_incrementation(SILParser::Pre_incrementationContext *context)
+{
+    RVariable name = visit(context->expression()).as<RVariable>();
+    Variable& variable = ProgramContext::getInstance().getVariable(name);
+
+    RValue result = variable + (RValue() = 1);
+    variable.setValue(result);
+
+    return std::move(name);
+}
+
+/**
+ * @brief Decrements a variable and returns its value
+ */
+Any SILinterpreter::visitPre_decrementation(SILParser::Pre_decrementationContext *context)
+{
+    RVariable name = visit(context->expression()).as<RVariable>();
+    Variable& variable = ProgramContext::getInstance().getVariable(name);
+
+    RValue result = variable - (RValue() = 1);
+    variable.setValue(result);
+
+    return variable;
+}
+
+/**
+ * @brief Negates a value
+ */
+Any SILinterpreter::visitUnary_minus(SILParser::Unary_minusContext *context)
+{
+    return negate(visit(context->expression()).as<RValue>());
+}
+
+/**
+ * @brief Visits a cast expression
+ */
+Any SILinterpreter::visitCast(SILParser::CastContext *context)
+{
+    RValue result;
+
+    auto& value = visit(context->expression()).as<RValue>();
+    const std::string& type = context->TYPE()->getText();
+
+    if (type == "integer")
+    {
+        result = cast<int>(value);
+    }
+    else if (type == "number")
+    {
+        result = cast<double>(value);
+    }
+    else if (type == "string")
+    {
+        result = cast<std::string>(value);
+    }
+    else // boolean
+    {
+        result = cast<bool>(value);
+    }
+
+    return std::move(result);
 }
 
 /**
@@ -334,75 +452,15 @@ Any SILinterpreter::visitTernary(SILParser::TernaryContext *context)
  */
 Any SILinterpreter::visitVariable_affectation(SILParser::Variable_affectationContext *context)
 {
-    const std::string& name = context->Id()->getText();
-    RValue& value = visit(context->expression()).as<RValue>();
+    const RVariable name = visit(context->ID).as<RVariable>();
+    Variable& variable = ProgramContext::getInstance().getVariable(name);
 
-    Variable& variable = variablesContexts.getVariable(name);
+    RValue& value = visit(context->value).as<RValue>();
     variable.setValue(value);
 
-    return variable;
+    return std::move(name);
 }
 
-/**
- * @brief Visits an atomic value
- */
-Any SILinterpreter::visitAtomic_value(SILParser::Atomic_valueContext *context)
-{
-    return visitAtom(context->atom());
-}
-
-/**
- * @brief Visits an atomic expression
- */
-Any SILinterpreter::visitAtom(SILParser::AtomContext *context)
-{
-    if (context->value_expression())
-    {
-        return visitValue_expression(context->value_expression());
-    }
-    else // Special value expression
-    {
-        return visitSpecial_value_expression(context->special_value_expression());
-    }
-}
-
-/**
- * @brief Visits an expression represented by another expression surrounded by parenthesis
- */
-Any SILinterpreter::visitParenthesis_expression(SILParser::Parenthesis_expressionContext *context)
-{
-    return visit(context->expression());
-}
-
-/**
- * @brief Visits a cast expression
- */
-Any SILinterpreter::visitCast(SILParser::CastContext *context)
-{
-    RValue result;
-
-    auto& value = visit(context->expression()).as<RValue>();
-    const std::string& type = context->TYPE()->getText();
-
-    if (type == "integer")
-    {
-        result = cast<int>(value);
-    }
-    else if (type == "number")
-    {
-        result = cast<double>(value);
-    }
-    else if (type == "string")
-    {
-        result = cast<std::string>(value);
-    }
-    else // boolean
-    {
-        result = cast<bool>(value);
-    }
-
-    return std::move(result);
-}
 
 /**
  * @brief Visit an expression representing a value
@@ -431,9 +489,8 @@ Any SILinterpreter::visitValue_expression(SILParser::Value_expressionContext *co
     }
     else if (context->Id())
     {
-        const std::string& name = context->Id()->getText();
-        Variable& variable = variablesContexts.getVariable(name);
-        return variable;
+        const RVariable name = context->Id()->getText();
+        return std::move(name);
     }
     else if (context->function_declaration())
     {
@@ -502,8 +559,8 @@ Any SILinterpreter::visitSpecial_value_expression(SILParser::Special_value_expre
  */
 Any SILinterpreter::visitVariable_creation(SILParser::Variable_creationContext *context)
 {
-    const std::string& name = context->Id()->getText();
-    Variable& newVariable = variablesContexts.createVariable(name);
+    const RVariable name = context->Id()->getText();
+    Variable& newVariable = ProgramContext::getInstance().createVariable(name);
 
     if (context->TYPE())
     {
@@ -549,7 +606,7 @@ Any SILinterpreter::visitVariable_creation(SILParser::Variable_creationContext *
         newVariable.setStatusType(Variable::StatusType::Const);
     }
 
-    return newVariable;
+    return std::move(name);
 }
 
 // Other methods ----------------------------------------------------------------------------------
