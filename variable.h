@@ -3,6 +3,12 @@
 
 #include "rvalue.h"
 
+#include <set>
+#include <utility>
+
+typedef std::pair<int, int> CompatibilityKey;
+typedef std::set<CompatibilityKey> CompatibilityTable;
+
 class Variable : public RValue
 {
 public:
@@ -38,6 +44,8 @@ private:
 
     StatusType statusType;
     ValueType valueType;
+
+    static CompatibilityTable compatibleTypes;
 };
 
 #endif // VARIABLE_H

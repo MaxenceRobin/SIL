@@ -90,9 +90,12 @@ Any SILinterpreter::visitInstruction(SILParser::InstructionContext *context)
     {
         visitBlock(context->block());
     }
-    else // action
+    else if (context->action())
     {
         visitAction(context->action());
+    }
+    else // epsilon
+    {
     }
 
     return 0;
@@ -508,36 +511,47 @@ Any SILinterpreter::visitVariable_creation(SILParser::Variable_creationContext *
     const std::string& name = context->Id()->getText();
     Variable& newVariable = variables[name];
 
+    if (context->TYPE())
+    {
+        const std::string& type = context->TYPE()->getText();
+
+        // All typed variable must be correctly initialized
+        if (type == "integer")
+        {
+            newVariable.setValue(0);
+            newVariable.setValueType(Variable::ValueType::Integer);
+        }
+        else if (type == "number")
+        {
+            newVariable.setValue(0.0);
+            newVariable.setValueType(Variable::ValueType::Number);
+        }
+        else if (type == "boolean")
+        {
+            newVariable.setValue(false);
+            newVariable.setValueType(Variable::ValueType::Boolean);
+        }
+        else if (type == "string")
+        {
+            newVariable.setValue(std::string(""));
+            newVariable.setValueType(Variable::ValueType::String);
+        }
+    }
+
     if (context->AFF())
     {
         auto& value = visit(context->expression()).as<RValue>();
         newVariable.setValue(value);
     }
 
-    if (context->TYPE())
-    {
-        const std::string& type = context->TYPE()->getText();
-
-        if (type == "integer")
-        {
-            newVariable.setValueType(Variable::ValueType::Integer);
-        }
-        else if (type == "number")
-        {
-            newVariable.setValueType(Variable::ValueType::Number);
-        }
-        else if (type == "boolean")
-        {
-            newVariable.setValueType(Variable::ValueType::Boolean);
-        }
-        else if (type == "string")
-        {
-            newVariable.setValueType(Variable::ValueType::String);
-        }
-    }
-
     if (context->CONST())
     {
+        // A constant must be initialized at the creation
+        if (!context->AFF())
+        {
+            throw 0;
+        }
+
         newVariable.setStatusType(Variable::StatusType::Const);
     }
 

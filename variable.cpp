@@ -1,5 +1,18 @@
 #include "variable.h"
 
+/*
+ * This table represent the non obvious compatible types
+ * Each pair represent a non obvious compatible association with :
+ *  The first value representing the type of the variable
+ *  The second value representing the type of the RValue
+ *
+ * Each type are represented using the index method of RValue, which means
+ * 0 = integer, 1 = double, 2 = boolean, 3 = string etc...
+ */
+CompatibilityTable Variable::compatibleTypes = {
+    {1, 0} // Doubles can accept integers
+};
+
 // Constructors and destructor --------------------------------------------------------------------
 
 /**
@@ -53,6 +66,25 @@ void Variable::setValueType(ValueType newValueType)
  */
 Variable& Variable::setValue(const RValue &value)
 {
+    // An exception is thrown if the user tries to modify a constant
+    if (statusType == Variable::StatusType::Const)
+    {
+        throw 0;
+    }
+
+    if (valueType != Variable::ValueType::Any)
+    {
+        // If the types are nor directly compatible
+        if (index() != value.index())
+        {
+            // Neither indirectly compatible
+            if (compatibleTypes.find({index(), value.index()}) == compatibleTypes.end())
+            {
+                throw 0;
+            }
+        }
+    }
+
     RValue::operator=(value);
     return *this;
 }

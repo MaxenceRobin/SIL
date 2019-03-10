@@ -87,16 +87,17 @@ Multi_comment   : '/*' .*? '*/' -> skip;
 // Parser -----------------------------------------------------------------------------------------
 
 // General file description ---------------------
-file                : instruction_list EOF;
-//instruction_list    : (instructions+=instruction Newline)* instructions+=instruction?;
-//instruction_list    : (instructions+=instruction (Newline|SEMICOLON))* instructions+=instruction?;
-instruction_list    : (instructions+=instruction (SEMICOLON instructions+=instruction)* | Newline)*;
+file                : Newline? instruction_list Newline? EOF;
+//instruction_list    : (instructions+=instruction (SEMICOLON instructions+=instruction)* | Newline)*;
+instruction_list    : (instructions+=instruction ((Newline|SEMICOLON) instructions+=instruction)*);
 
 // List of possible instructions ----------------
 instruction : block
-            | action;
+            | action
+            | /* epsilon */
+            ;
 
-block   : L_BRACKET instruction_list R_BRACKET;
+block   : L_BRACKET Newline? instruction_list Newline? R_BRACKET;
 
 action  : OUT expression_list
         | PAUSE

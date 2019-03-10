@@ -66,6 +66,8 @@ public:
     virtual size_t getRuleIndex() const override;
     Instruction_listContext *instruction_list();
     antlr4::tree::TerminalNode *EOF();
+    std::vector<antlr4::tree::TerminalNode *> Newline();
+    antlr4::tree::TerminalNode* Newline(size_t i);
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -79,10 +81,10 @@ public:
     std::vector<InstructionContext *> instructions;;
     Instruction_listContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<antlr4::tree::TerminalNode *> Newline();
-    antlr4::tree::TerminalNode* Newline(size_t i);
     std::vector<InstructionContext *> instruction();
     InstructionContext* instruction(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> Newline();
+    antlr4::tree::TerminalNode* Newline(size_t i);
     std::vector<antlr4::tree::TerminalNode *> SEMICOLON();
     antlr4::tree::TerminalNode* SEMICOLON(size_t i);
 
@@ -112,6 +114,8 @@ public:
     antlr4::tree::TerminalNode *L_BRACKET();
     Instruction_listContext *instruction_list();
     antlr4::tree::TerminalNode *R_BRACKET();
+    std::vector<antlr4::tree::TerminalNode *> Newline();
+    antlr4::tree::TerminalNode* Newline(size_t i);
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
