@@ -4,14 +4,12 @@
 #include "ANTLR/antlr4-runtime/SILBaseVisitor.h"
 
 #include "variable.h"
+#include "programcontext.h"
 
 #include <unordered_map>
 
 using antlrcpp::Any;
 
-/**
- * @brief Interpret and execute the SIL program
- */
 class SILinterpreter : public SILBaseVisitor
 {
 public:
@@ -61,6 +59,7 @@ private:
 
 private:
 
+    ProgramContext variablesContexts;
     std::unordered_map<std::string, Variable> variables;
 };
 

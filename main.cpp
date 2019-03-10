@@ -15,8 +15,7 @@ int main(int argc, char* argv[])
         }
         catch (SILexception e)
         {
-            std::cout << "Erreur :" << std::endl;
-            std::cout << e.getMessage() << std::endl;
+            std::cout << "Erreur : " << e.getMessage() << std::endl;
             getchar();
         }
 

@@ -106,7 +106,9 @@ Any SILinterpreter::visitInstruction(SILParser::InstructionContext *context)
  */
 Any SILinterpreter::visitBlock(SILParser::BlockContext *context)
 {
+    variablesContexts.addBlock();
     visitInstruction_list(context->instruction_list());
+    variablesContexts.removeBlock();
 
     return 0;
 }
@@ -335,7 +337,7 @@ Any SILinterpreter::visitVariable_affectation(SILParser::Variable_affectationCon
     const std::string& name = context->Id()->getText();
     RValue& value = visit(context->expression()).as<RValue>();
 
-    Variable& variable = variables[name];
+    Variable& variable = variablesContexts.getVariable(name);
     variable.setValue(value);
 
     return variable;
@@ -430,16 +432,8 @@ Any SILinterpreter::visitValue_expression(SILParser::Value_expressionContext *co
     else if (context->Id())
     {
         const std::string& name = context->Id()->getText();
-
-        if (variables.find(name) != variables.end())
-        {
-            Variable variable = variables[name];
-            return std::move(variable);
-        }
-        else
-        {
-            throw SILexception("La variable <" + name + "> n'existe pas");
-        }
+        Variable& variable = variablesContexts.getVariable(name);
+        return variable;
     }
     else if (context->function_declaration())
     {
@@ -509,7 +503,7 @@ Any SILinterpreter::visitSpecial_value_expression(SILParser::Special_value_expre
 Any SILinterpreter::visitVariable_creation(SILParser::Variable_creationContext *context)
 {
     const std::string& name = context->Id()->getText();
-    Variable& newVariable = variables[name];
+    Variable& newVariable = variablesContexts.createVariable(name);
 
     if (context->TYPE())
     {
